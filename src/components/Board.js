@@ -16,7 +16,7 @@ class Board extends Component {
       [0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0]
     ],
-    snakeCoordinates: [[1, 0], [1, 1], [1, 2]],
+    snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
     direction: 'down'
   };
 
@@ -45,7 +45,6 @@ class Board extends Component {
     }
   };
 
-  isCollision() {}
   isFood() {}
   isWall() {}
   gameOver() {}
@@ -54,6 +53,7 @@ class Board extends Component {
     let boardHeight = board.length;
     let boardWidth = board[0].length;
     let headCoordinate = [...snakeCoordinates[snakeCoordinates.length - 1]];
+    //move snake, go to other side of board if at end of board
     if (
       this.state.direction === 'right' &&
       headCoordinate[1] === boardWidth - 1
@@ -79,9 +79,21 @@ class Board extends Component {
     }
     this.setState(prevState => {
       let newSnakeCoordinates = [...prevState.snakeCoordinates];
-      newSnakeCoordinates.push(headCoordinate);
       newSnakeCoordinates.shift();
-      return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
+      if (this.isCollisionWithSelf(headCoordinate, newSnakeCoordinates)) {
+        console.log('MURDER');
+        return { isPlaying: false };
+      } else {
+        console.log('all good');
+        newSnakeCoordinates.push(headCoordinate);
+        return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
+      }
+    });
+  }
+
+  isCollisionWithSelf(headCoord, prevBody) {
+    return prevBody.some(coor => {
+      return coor[0] === headCoord[0] && coor[1] === headCoord[1];
     });
   }
 
