@@ -4,6 +4,7 @@ import Buttons from './Buttons';
 
 class Board extends Component {
   state = {
+    intervalId: null,
     isPlaying: true,
     isTurnTaken: false,
     board: [
@@ -18,6 +19,18 @@ class Board extends Component {
     snakeCoordinates: [[1, 0], [1, 1], [1, 2]],
     direction: 'down'
   };
+
+  componentDidMount() {
+    let intervalId = setInterval(() => {
+      this.moveSnake();
+    }, 1000);
+    this.setState({ intervalId });
+    console.log('intervalId', intervalId);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
 
   handleBtnPress = e => {
     let btnName = e.target.innerText;
@@ -37,21 +50,34 @@ class Board extends Component {
   isWall() {}
   gameOver() {}
   moveSnake() {
-    console.log('in moveSnake');
-    let headCoordinate = [
-      ...this.state.snakeCoordinates[this.state.snakeCoordinates.length - 1]
-    ];
-    if (this.state.direction === 'right') {
+    let { snakeCoordinates, board } = this.state;
+    let boardHeight = board.length;
+    let boardWidth = board[0].length;
+    let headCoordinate = [...snakeCoordinates[snakeCoordinates.length - 1]];
+    if (
+      this.state.direction === 'right' &&
+      headCoordinate[1] === boardWidth - 1
+    ) {
+      headCoordinate[1] = 0;
+    } else if (this.state.direction === 'right') {
       headCoordinate[1] += 1;
+    } else if (this.state.direction === 'left' && headCoordinate[1] === 0) {
+      headCoordinate[1] = boardWidth - 1;
     } else if (this.state.direction === 'left') {
       headCoordinate[1] -= 1;
+    } else if (
+      this.state.direction === 'down' &&
+      headCoordinate[0] === boardHeight - 1
+    ) {
+      headCoordinate[0] = 0;
     } else if (this.state.direction === 'down') {
       headCoordinate[0] += 1;
+    } else if (this.state.direction === 'up' && headCoordinate[0] === 0) {
+      headCoordinate[0] = boardHeight - 1;
     } else if (this.state.direction === 'up') {
       headCoordinate[0] -= 1;
     }
     this.setState(prevState => {
-      // debugger
       let newSnakeCoordinates = [...prevState.snakeCoordinates];
       newSnakeCoordinates.push(headCoordinate);
       newSnakeCoordinates.shift();
@@ -74,14 +100,6 @@ class Board extends Component {
         }
       });
     });
-
-    if (!this.props.isInitialized) {
-      let intervalId = setInterval(() => {
-        console.log('interval completed');
-        this.moveSnake();
-      }, 1000);
-      this.props.initializationComplete();
-    }
 
     return (
       <div className="Board">
