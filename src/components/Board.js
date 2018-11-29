@@ -2,23 +2,24 @@ import React, { Component } from 'react';
 import Square from './Square';
 import Buttons from './Buttons';
 
+const DEFAULT_STATE = {
+  intervalId: null,
+  isPlaying: true,
+  isTurnTaken: false,
+  board: [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+  ],
+  snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
+  direction: 'down'
+};
 class Board extends Component {
-  state = {
-    intervalId: null,
-    isPlaying: true,
-    isTurnTaken: false,
-    board: [
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0]
-    ],
-    snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
-    direction: 'down'
-  };
+  state = DEFAULT_STATE;
 
   componentDidMount() {
     let intervalId = setInterval(() => {
@@ -44,6 +45,11 @@ class Board extends Component {
       this.setState({ direction: 'right' });
     }
   };
+
+  resetGame() {
+    // getting error, start here
+    this.setState(DEFAULT_STATE);
+  }
 
   isFood() {}
   isWall() {}
@@ -98,6 +104,14 @@ class Board extends Component {
   }
 
   render() {
+    if (!this.state.isPlaying) {
+      return (
+        <div>
+          <p>GAME OVER</p>
+          <button onClick={this.resetGame}>Play Again?</button>
+        </div>
+      );
+    }
     const squares = this.state.board.map((row, rowIndex) => {
       return row.map((current, columnIndex) => {
         for (let [coorRow, coorCol] of this.state.snakeCoordinates) {
