@@ -1,5 +1,7 @@
 # Snake Game
 
+Go to https://alexabush.github.io/snake-game/ to play!
+
 ### Built with Create-React-App.
 
 ## How to Play
