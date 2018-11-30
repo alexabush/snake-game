@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Square from './Square';
 import Buttons from './Buttons';
+import './Board.css';
 
 const DEFAULT_STATE = {
   intervalId: null,

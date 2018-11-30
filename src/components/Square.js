@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
+import './Square.css';
 
 class Square extends Component {
   render() {
     let { type } = this.props;
     let val;
     if (type === 'empty') {
-      val = <div className="Square" />;
+      val = <div className="square" />;
     } else if (type === 'snake') {
-      val = <div className="Square">Snake</div>;
+      val = <div className="square snake">Snake</div>;
     } else if (type === 'food') {
-      val = <div className="Square">Food</div>;
+      val = <div className="square food">Food</div>;
     }
     return val;
   }
