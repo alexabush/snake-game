@@ -46,10 +46,9 @@ class Board extends Component {
     }
   };
 
-  resetGame() {
-    // getting error, start here
+  resetGame = () => {
     this.setState(DEFAULT_STATE);
-  }
+  };
 
   isFood() {}
   isWall() {}
@@ -112,17 +111,30 @@ class Board extends Component {
         </div>
       );
     }
+    let uniqKeyGen = counter();
     const squares = this.state.board.map((row, rowIndex) => {
       return row.map((current, columnIndex) => {
         for (let [coorRow, coorCol] of this.state.snakeCoordinates) {
           if (coorRow === rowIndex && coorCol === columnIndex) {
-            return <Square type="snake">current</Square>;
+            return (
+              <Square key={uniqKeyGen()} type="snake">
+                current
+              </Square>
+            );
           }
         }
         if (current === 0) {
-          return <Square type="empty">current</Square>;
+          return (
+            <Square key={uniqKeyGen()} type="empty">
+              current
+            </Square>
+          );
         } else if (current === 2) {
-          return <Square type="food">current</Square>;
+          return (
+            <Square key={uniqKeyGen()} type="food">
+              current
+            </Square>
+          );
         }
       });
     });
@@ -137,3 +149,11 @@ class Board extends Component {
 }
 
 export default Board;
+
+function counter() {
+  let count = 0;
+  return function inner() {
+    count += 1;
+    return count;
+  };
+}

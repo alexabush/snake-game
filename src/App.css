@@ -1,12 +1,9 @@
 .App {
   text-align: center;
-  border: 1px solid red
-
 }
 
 .Board {
   display: flex;
-  border: 1px solid blue;
   flex-wrap: wrap;
 }
 
