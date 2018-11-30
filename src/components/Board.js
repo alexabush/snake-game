@@ -16,6 +16,7 @@ const DEFAULT_STATE = {
     [0, 0, 0, 0, 0, 0, 0]
   ],
   snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
+  foodCoords: [],
   direction: 'down'
 };
 class Board extends Component {
@@ -27,6 +28,7 @@ class Board extends Component {
     }, 1000);
     this.setState({ intervalId });
     console.log('intervalId', intervalId);
+    this.addFood();
   }
 
   componentWillUnmount() {
@@ -48,6 +50,18 @@ class Board extends Component {
 
   resetGame = () => {
     this.setState(DEFAULT_STATE);
+  };
+
+  addFood = () => {
+    let { snakeCoordinates, board } = this.state;
+    let newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
+    while (this.isCollision(newFoodCoord, snakeCoordinates)) {
+      console.log('food overlaps with snake');
+      newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
+    }
+    this.setState(prevState => ({
+      foodCoords: [...prevState.foodCoords, newFoodCoord]
+    }));
   };
 
   isFood() {}
@@ -85,7 +99,7 @@ class Board extends Component {
     this.setState(prevState => {
       let newSnakeCoordinates = [...prevState.snakeCoordinates];
       newSnakeCoordinates.shift();
-      if (this.isCollisionWithSelf(headCoordinate, newSnakeCoordinates)) {
+      if (this.isCollision(headCoordinate, newSnakeCoordinates)) {
         console.log('MURDER');
         return { isPlaying: false };
       } else {
@@ -96,9 +110,9 @@ class Board extends Component {
     });
   }
 
-  isCollisionWithSelf(headCoord, prevBody) {
-    return prevBody.some(coor => {
-      return coor[0] === headCoord[0] && coor[1] === headCoord[1];
+  isCollision(itemCoord, snakeBody) {
+    return snakeBody.some(coor => {
+      return coor[0] === itemCoord[0] && coor[1] === itemCoord[1];
     });
   }
 
@@ -116,26 +130,16 @@ class Board extends Component {
       return row.map((current, columnIndex) => {
         for (let [coorRow, coorCol] of this.state.snakeCoordinates) {
           if (coorRow === rowIndex && coorCol === columnIndex) {
-            return (
-              <Square key={uniqKeyGen()} type="snake">
-                current
-              </Square>
-            );
+            return <Square key={uniqKeyGen()} type="snake" />;
           }
         }
-        if (current === 0) {
-          return (
-            <Square key={uniqKeyGen()} type="empty">
-              current
-            </Square>
-          );
-        } else if (current === 2) {
-          return (
-            <Square key={uniqKeyGen()} type="food">
-              current
-            </Square>
-          );
+        for (let [coorRow, coorCol] of this.state.foodCoords) {
+          if (coorRow === rowIndex && coorCol === columnIndex) {
+            return <Square key={uniqKeyGen()} type="food" />;
+          }
         }
+
+        return <Square key={uniqKeyGen()} type="empty" />;
       });
     });
 
@@ -156,4 +160,10 @@ function counter() {
     count += 1;
     return count;
   };
+}
+
+//includes start, excludes end
+function randomNum(start, end) {
+  const num = Math.floor(Math.random() * end) + start;
+  return num;
 }
