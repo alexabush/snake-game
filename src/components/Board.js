@@ -6,6 +6,7 @@ const DEFAULT_STATE = {
   intervalId: null,
   isPlaying: true,
   isTurnTaken: false,
+  isFood: false,
   board: [
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
@@ -53,22 +54,20 @@ class Board extends Component {
   };
 
   addFood = () => {
-    let { snakeCoordinates, board } = this.state;
+    let { snakeCoordinates } = this.state;
     let newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
     while (this.isCollision(newFoodCoord, snakeCoordinates)) {
       console.log('food overlaps with snake');
       newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
     }
     this.setState(prevState => ({
-      foodCoords: [...prevState.foodCoords, newFoodCoord]
+      foodCoords: [...prevState.foodCoords, newFoodCoord],
+      isFood: true
     }));
   };
 
-  isFood() {}
-  isWall() {}
-  gameOver() {}
-  moveSnake() {
-    let { snakeCoordinates, board } = this.state;
+  moveSnake = () => {
+    let { snakeCoordinates, board, foodCoords } = this.state;
     let boardHeight = board.length;
     let boardWidth = board[0].length;
     let headCoordinate = [...snakeCoordinates[snakeCoordinates.length - 1]];
@@ -98,17 +97,28 @@ class Board extends Component {
     }
     this.setState(prevState => {
       let newSnakeCoordinates = [...prevState.snakeCoordinates];
+      // this conditional only works with one piece of food
+      if (this.isCollision(headCoordinate, foodCoords)) {
+        newSnakeCoordinates.push(headCoordinate);
+        return {
+          snakeCoordinates: newSnakeCoordinates,
+          foodCoords: [],
+          isTurnTaken: true,
+          isFood: false
+        };
+      }
       newSnakeCoordinates.shift();
       if (this.isCollision(headCoordinate, newSnakeCoordinates)) {
         console.log('MURDER');
         return { isPlaying: false };
-      } else {
-        console.log('all good');
-        newSnakeCoordinates.push(headCoordinate);
-        return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
       }
+      newSnakeCoordinates.push(headCoordinate);
+      return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
     });
-  }
+    if (!this.state.isFood) {
+      this.addFood();
+    }
+  };
 
   isCollision(itemCoord, snakeBody) {
     return snakeBody.some(coor => {
