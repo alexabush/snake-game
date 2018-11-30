@@ -37,6 +37,18 @@ class Board extends Component {
     clearInterval(this.state.intervalId);
   }
 
+  handleKeyPress = ({ keyCode }) => {
+    if ([65, 37].includes(keyCode)) {
+      this.setState({ direction: 'left' });
+    } else if ([87, 38].includes(keyCode)) {
+      this.setState({ direction: 'up' });
+    } else if ([68, 39].includes(keyCode)) {
+      this.setState({ direction: 'right' });
+    } else if ([83, 40].includes(keyCode)) {
+      this.setState({ direction: 'down' });
+    }
+  };
+
   handleBtnPress = e => {
     let btnName = e.target.innerText;
     if (btnName === 'Up') {
@@ -155,7 +167,7 @@ class Board extends Component {
     });
 
     return (
-      <div className="Board">
+      <div className="Board" onKeyDown={this.handleKeyPress} tabIndex="0">
         {squares}
         <Buttons handleBtnPress={this.handleBtnPress} />
       </div>
