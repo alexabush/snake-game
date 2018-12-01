@@ -5,7 +5,7 @@ class FocusIndicator extends Component {
   render() {
     return (
       <div className="focus-indicator">
-        <p>Board Has Focus?</p>
+        <p>Game Has Focus?</p>
         <div className="focus" />
       </div>
     );
