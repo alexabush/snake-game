@@ -2,4 +2,24 @@
   display: flex;
   flex-wrap: wrap;
   width: 700px;
+  outline: 0;
+  background: white;
+}
+
+.Board .focus {
+  background: red;
+  height: 40px;
+  width: 40px;
+  border-radius: 50px;
+  align-self: center;
+  align-items: center;
+}
+.Board:focus .focus {
+  background: green;
+}
+
+.user-feedback-container {
+  display: flex;
+  width: 100%;
+  background: white;
 }

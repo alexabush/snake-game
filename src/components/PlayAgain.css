@@ -1,0 +1,13 @@
+.play-again {
+  margin-top: 100px;
+}
+
+.play-again p {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.play-again button {
+  font-size: 24px;
+}

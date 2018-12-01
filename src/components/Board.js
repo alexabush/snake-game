@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import Square from './Square';
 import Buttons from './Buttons';
 import './Board.css';
+import FocusIndicator from './FocusIndicator';
+import PlayAgain from './PlayAgain';
 
 const DEFAULT_STATE = {
   intervalId: null,
@@ -75,6 +76,10 @@ class Board extends Component {
 
   resetGame = () => {
     this.setState(DEFAULT_STATE);
+  };
+
+  componentDidUpdate = () => {
+    this.focusOnBoard();
   };
 
   addFood = () => {
@@ -152,12 +157,7 @@ class Board extends Component {
 
   render() {
     if (!this.state.isPlaying) {
-      return (
-        <div>
-          <p>GAME OVER</p>
-          <button onClick={this.resetGame}>Play Again?</button>
-        </div>
-      );
+      return <PlayAgain resetGame={this.resetGame} />;
     }
     let uniqKeyGen = counter();
     const squares = this.state.board.map((row, rowIndex) => {
@@ -185,7 +185,10 @@ class Board extends Component {
         ref={this.boardRef}
       >
         {squares}
-        <Buttons handleBtnPress={this.handleBtnPress} />
+        <div className="user-feedback-container">
+          <FocusIndicator />
+          <Buttons handleBtnPress={this.handleBtnPress} />
+        </div>
       </div>
     );
   }
