@@ -86,12 +86,13 @@ class App extends Component {
   };
 
   addFood = () => {
-    let { snakeCoords } = this.state;
+    let { headCoords, snakeCoords } = this.state;
     let newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
-    while (this.isCollision(newFoodCoord, snakeCoords)) {
-      console.log('food overlaps with snake');
+    while (this.isCollision(newFoodCoord, [headCoords, ...snakeCoords])) {
+      console.log('REJECTED FOOD COORDINATE', newFoodCoord);
       newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
     }
+    console.log('food added to board:', newFoodCoord);
     this.setState(prevState => ({
       foodCoords: [...prevState.foodCoords, newFoodCoord],
       isFood: true
