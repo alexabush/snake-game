@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import Square from './Square';
 import Buttons from './Buttons';
 import './Board.css';
@@ -22,7 +23,16 @@ const DEFAULT_STATE = {
   direction: 'down'
 };
 class Board extends Component {
+  constructor(props) {
+    super(props);
+    this.boardRef = React.createRef();
+  }
+
   state = DEFAULT_STATE;
+
+  focusOnBoard = () => {
+    this.boardRef.current.focus();
+  };
 
   componentDidMount() {
     let intervalId = setInterval(() => {
@@ -31,6 +41,7 @@ class Board extends Component {
     this.setState({ intervalId });
     console.log('intervalId', intervalId);
     this.addFood();
+    this.focusOnBoard();
   }
 
   componentWillUnmount() {
@@ -167,7 +178,12 @@ class Board extends Component {
     });
 
     return (
-      <div className="Board" onKeyDown={this.handleKeyPress} tabIndex="0">
+      <div
+        className="Board"
+        onKeyDown={this.handleKeyPress}
+        tabIndex="0"
+        ref={this.boardRef}
+      >
         {squares}
         <Buttons handleBtnPress={this.handleBtnPress} />
       </div>
