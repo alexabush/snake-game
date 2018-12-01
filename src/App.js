@@ -1,15 +1,192 @@
 import React, { Component } from 'react';
+import Buttons from './components/Buttons';
 import './App.css';
+import FocusIndicator from './components/FocusIndicator';
+import PlayAgain from './components/PlayAgain';
 import Board from './components/Board';
 
+const DEFAULT_STATE = {
+  intervalId: null,
+  isPlaying: true,
+  isTurnTaken: false,
+  isFood: false,
+  board: [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+  ],
+  snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
+  foodCoords: [],
+  direction: 'down'
+};
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.appRef = React.createRef();
+  }
+
+  state = DEFAULT_STATE;
+
+  focusOnApp = () => {
+    this.appRef.current.focus();
+  };
+
+  componentDidMount() {
+    let intervalId = setInterval(() => {
+      this.moveSnake();
+    }, 1000);
+    this.setState({ intervalId });
+    console.log('intervalId', intervalId);
+    this.addFood();
+    this.focusOnApp();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
+
+  handleKeyPress = ({ keyCode }) => {
+    if ([65, 37].includes(keyCode)) {
+      this.setState({ direction: 'left' });
+    } else if ([87, 38].includes(keyCode)) {
+      this.setState({ direction: 'up' });
+    } else if ([68, 39].includes(keyCode)) {
+      this.setState({ direction: 'right' });
+    } else if ([83, 40].includes(keyCode)) {
+      this.setState({ direction: 'down' });
+    }
+  };
+
+  handleBtnPress = e => {
+    let btnName = e.target.innerText;
+    if (btnName === 'Up') {
+      this.setState({ direction: 'up' });
+    } else if (btnName === 'Down') {
+      this.setState({ direction: 'down' });
+    } else if (btnName === 'Left') {
+      this.setState({ direction: 'left' });
+    } else if (btnName === 'Right') {
+      this.setState({ direction: 'right' });
+    }
+  };
+
+  resetGame = () => {
+    this.setState(DEFAULT_STATE);
+  };
+
+  componentDidUpdate = () => {
+    this.focusOnApp();
+  };
+
+  addFood = () => {
+    let { snakeCoordinates } = this.state;
+    let newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
+    while (this.isCollision(newFoodCoord, snakeCoordinates)) {
+      console.log('food overlaps with snake');
+      newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
+    }
+    this.setState(prevState => ({
+      foodCoords: [...prevState.foodCoords, newFoodCoord],
+      isFood: true
+    }));
+  };
+
+  moveSnake = () => {
+    let { snakeCoordinates, board, foodCoords } = this.state;
+    let boardHeight = board.length;
+    let boardWidth = board[0].length;
+    let headCoordinate = [...snakeCoordinates[snakeCoordinates.length - 1]];
+    //move snake, go to other side of board if at end of board
+    if (
+      this.state.direction === 'right' &&
+      headCoordinate[1] === boardWidth - 1
+    ) {
+      headCoordinate[1] = 0;
+    } else if (this.state.direction === 'right') {
+      headCoordinate[1] += 1;
+    } else if (this.state.direction === 'left' && headCoordinate[1] === 0) {
+      headCoordinate[1] = boardWidth - 1;
+    } else if (this.state.direction === 'left') {
+      headCoordinate[1] -= 1;
+    } else if (
+      this.state.direction === 'down' &&
+      headCoordinate[0] === boardHeight - 1
+    ) {
+      headCoordinate[0] = 0;
+    } else if (this.state.direction === 'down') {
+      headCoordinate[0] += 1;
+    } else if (this.state.direction === 'up' && headCoordinate[0] === 0) {
+      headCoordinate[0] = boardHeight - 1;
+    } else if (this.state.direction === 'up') {
+      headCoordinate[0] -= 1;
+    }
+    this.setState(prevState => {
+      let newSnakeCoordinates = [...prevState.snakeCoordinates];
+      // this conditional only works with one piece of food
+      if (this.isCollision(headCoordinate, foodCoords)) {
+        newSnakeCoordinates.push(headCoordinate);
+        return {
+          snakeCoordinates: newSnakeCoordinates,
+          foodCoords: [],
+          isTurnTaken: true,
+          isFood: false
+        };
+      }
+      newSnakeCoordinates.shift();
+      if (this.isCollision(headCoordinate, newSnakeCoordinates)) {
+        console.log('MURDER');
+        return { isPlaying: false };
+      }
+      newSnakeCoordinates.push(headCoordinate);
+      return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
+    });
+    if (!this.state.isFood) {
+      this.addFood();
+    }
+  };
+
+  isCollision(itemCoord, snakeBody) {
+    return snakeBody.some(coor => {
+      return coor[0] === itemCoord[0] && coor[1] === itemCoord[1];
+    });
+  }
+
   render() {
     return (
-      <div className="App">
-        <Board />
+      <div
+        className="App"
+        onKeyDown={this.handleKeyPress}
+        tabIndex="0"
+        ref={this.appRef}
+      >
+        {this.state.isPlaying ? (
+          <div>
+            <Board
+              board={this.state.board}
+              snakeCoordinates={this.state.snakeCoordinates}
+              foodCoords={this.state.foodCoords}
+            />
+            <div className="user-feedback-container">
+              <FocusIndicator />
+              <Buttons handleBtnPress={this.handleBtnPress} />
+            </div>
+          </div>
+        ) : (
+          <PlayAgain resetGame={this.resetGame} />
+        )}
       </div>
     );
   }
 }
 
 export default App;
+
+//includes start, excludes end
+function randomNum(start, end) {
+  const num = Math.floor(Math.random() * end) + start;
+  return num;
+}
