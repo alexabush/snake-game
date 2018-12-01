@@ -50,26 +50,28 @@ class App extends Component {
   }
 
   handleKeyPress = ({ keyCode }) => {
-    if ([65, 37].includes(keyCode)) {
+    let { direction } = this.state;
+    if ([65, 37].includes(keyCode) && direction !== 'right') {
       this.setState({ direction: 'left' });
-    } else if ([87, 38].includes(keyCode)) {
+    } else if ([87, 38].includes(keyCode) && direction !== 'down') {
       this.setState({ direction: 'up' });
-    } else if ([68, 39].includes(keyCode)) {
+    } else if ([68, 39].includes(keyCode) && direction !== 'left') {
       this.setState({ direction: 'right' });
-    } else if ([83, 40].includes(keyCode)) {
+    } else if ([83, 40].includes(keyCode) && direction !== 'up') {
       this.setState({ direction: 'down' });
     }
   };
 
   handleBtnPress = e => {
+    let { direction } = this.state;
     let btnName = e.target.innerText;
-    if (btnName === 'Up') {
+    if (btnName === 'Up' && direction !== 'down') {
       this.setState({ direction: 'up' });
-    } else if (btnName === 'Down') {
+    } else if (btnName === 'Down' && direction !== 'up') {
       this.setState({ direction: 'down' });
-    } else if (btnName === 'Left') {
+    } else if (btnName === 'Left' && direction !== 'right') {
       this.setState({ direction: 'left' });
-    } else if (btnName === 'Right') {
+    } else if (btnName === 'Right' && direction !== 'left') {
       this.setState({ direction: 'right' });
     }
   };

@@ -11,3 +11,7 @@
 .play-again button {
   font-size: 24px;
 }
+
+.play-again button:focus {
+  outline: none !important;
+}
