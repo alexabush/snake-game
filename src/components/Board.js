@@ -7,7 +7,7 @@ class Board extends Component {
     let uniqKeyGen = counter();
     const squares = this.props.board.map((row, rowIndex) => {
       return row.map((current, columnIndex) => {
-        for (let [coorRow, coorCol] of this.props.snakeCoordinates) {
+        for (let [coorRow, coorCol] of this.props.snakeCoords) {
           if (coorRow === rowIndex && coorCol === columnIndex) {
             return <Square key={uniqKeyGen()} type="snake" />;
           }
@@ -16,6 +16,12 @@ class Board extends Component {
           if (coorRow === rowIndex && coorCol === columnIndex) {
             return <Square key={uniqKeyGen()} type="food" />;
           }
+        }
+        if (
+          this.props.headCoords[0] === rowIndex &&
+          this.props.headCoords[1] === columnIndex
+        ) {
+          return <Square key={uniqKeyGen()} type="head" />;
         }
 
         return <Square key={uniqKeyGen()} type="empty" />;

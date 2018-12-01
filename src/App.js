@@ -19,7 +19,8 @@ const DEFAULT_STATE = {
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0]
   ],
-  snakeCoordinates: [[1, 0], [1, 1], [1, 2], [1, 3]],
+  headCoords: [1, 3],
+  snakeCoords: [[1, 0], [1, 1], [1, 2]],
   foodCoords: [],
   direction: 'down'
 };
@@ -85,9 +86,9 @@ class App extends Component {
   };
 
   addFood = () => {
-    let { snakeCoordinates } = this.state;
+    let { snakeCoords } = this.state;
     let newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
-    while (this.isCollision(newFoodCoord, snakeCoordinates)) {
+    while (this.isCollision(newFoodCoord, snakeCoords)) {
       console.log('food overlaps with snake');
       newFoodCoord = [randomNum(0, 7), randomNum(0, 7)];
     }
@@ -98,53 +99,56 @@ class App extends Component {
   };
 
   moveSnake = () => {
-    let { snakeCoordinates, board, foodCoords } = this.state;
+    let { board, foodCoords, headCoords } = this.state;
+    let newHeadCoords = [...headCoords];
     let boardHeight = board.length;
     let boardWidth = board[0].length;
-    let headCoordinate = [...snakeCoordinates[snakeCoordinates.length - 1]];
     //move snake, go to other side of board if at end of board
-    if (
-      this.state.direction === 'right' &&
-      headCoordinate[1] === boardWidth - 1
-    ) {
-      headCoordinate[1] = 0;
+    if (this.state.direction === 'right' && headCoords[1] === boardWidth - 1) {
+      newHeadCoords[1] = 0;
     } else if (this.state.direction === 'right') {
-      headCoordinate[1] += 1;
-    } else if (this.state.direction === 'left' && headCoordinate[1] === 0) {
-      headCoordinate[1] = boardWidth - 1;
+      newHeadCoords[1] += 1;
+    } else if (this.state.direction === 'left' && newHeadCoords[1] === 0) {
+      newHeadCoords[1] = boardWidth - 1;
     } else if (this.state.direction === 'left') {
-      headCoordinate[1] -= 1;
+      newHeadCoords[1] -= 1;
     } else if (
       this.state.direction === 'down' &&
-      headCoordinate[0] === boardHeight - 1
+      newHeadCoords[0] === boardHeight - 1
     ) {
-      headCoordinate[0] = 0;
+      newHeadCoords[0] = 0;
     } else if (this.state.direction === 'down') {
-      headCoordinate[0] += 1;
-    } else if (this.state.direction === 'up' && headCoordinate[0] === 0) {
-      headCoordinate[0] = boardHeight - 1;
+      newHeadCoords[0] += 1;
+    } else if (this.state.direction === 'up' && newHeadCoords[0] === 0) {
+      newHeadCoords[0] = boardHeight - 1;
     } else if (this.state.direction === 'up') {
-      headCoordinate[0] -= 1;
+      newHeadCoords[0] -= 1;
     }
     this.setState(prevState => {
-      let newSnakeCoordinates = [...prevState.snakeCoordinates];
+      let prevHeadCoords = [...prevState.headCoords];
+      let newsnakeCoords = [...prevState.snakeCoords];
       // this conditional only works with one piece of food
-      if (this.isCollision(headCoordinate, foodCoords)) {
-        newSnakeCoordinates.push(headCoordinate);
+      if (this.isCollision(newHeadCoords, foodCoords)) {
+        newsnakeCoords.push(prevHeadCoords);
         return {
-          snakeCoordinates: newSnakeCoordinates,
+          headCoords: newHeadCoords,
+          snakeCoords: newsnakeCoords,
           foodCoords: [],
           isTurnTaken: true,
           isFood: false
         };
       }
-      newSnakeCoordinates.shift();
-      if (this.isCollision(headCoordinate, newSnakeCoordinates)) {
+      newsnakeCoords.shift();
+      if (this.isCollision(newHeadCoords, newsnakeCoords)) {
         console.log('MURDER');
         return { isPlaying: false };
       }
-      newSnakeCoordinates.push(headCoordinate);
-      return { snakeCoordinates: newSnakeCoordinates, isTurnTaken: true };
+      newsnakeCoords.push(prevHeadCoords);
+      return {
+        headCoords: newHeadCoords,
+        snakeCoords: newsnakeCoords,
+        isTurnTaken: true
+      };
     });
     if (!this.state.isFood) {
       this.addFood();
@@ -168,8 +172,9 @@ class App extends Component {
         {this.state.isPlaying ? (
           <div>
             <Board
+              headCoords={this.state.headCoords}
               board={this.state.board}
-              snakeCoordinates={this.state.snakeCoordinates}
+              snakeCoords={this.state.snakeCoords}
               foodCoords={this.state.foodCoords}
             />
             <div className="user-feedback-container">

@@ -9,6 +9,8 @@ class Square extends Component {
       val = <div className="square" />;
     } else if (type === 'snake') {
       val = <div className="square snake">Snake</div>;
+    } else if (type === 'head') {
+      val = <div className="square snake">Head</div>;
     } else if (type === 'food') {
       val = <div className="square food">Food</div>;
     }
