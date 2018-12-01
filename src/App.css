@@ -33,3 +33,9 @@ p {
 .App:focus .focus {
   background: green;
 }
+
+.user-feedback-container {
+  display: flex;
+  width: 100%;
+  background: white;
+}
